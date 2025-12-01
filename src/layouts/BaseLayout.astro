@@ -30,25 +30,70 @@ const { title = BLOG_NAME, description = SITE_DESCRIPTION } = Astro.props;
       (function() {
         const pageTransition = document.getElementById('page-transition');
         
-        // Add fade-in animation on page load
-        if (pageTransition) {
-          // Start with opacity 0
+        // Function to initialize page transition
+        function initPageTransition() {
+          if (!pageTransition) return;
+          
+          // Check if page is being restored from cache (back/forward navigation)
+          const isPageRestored = window.performance && 
+            window.performance.navigation && 
+            window.performance.navigation.type === 2;
+          
+          // If page is restored from cache, ensure it's visible immediately
+          if (isPageRestored) {
+            pageTransition.style.opacity = '';
+            pageTransition.style.transform = '';
+            pageTransition.classList.add('page-enter');
+            return;
+          }
+          
+          // For normal page load, start with opacity 0
           pageTransition.style.opacity = '0';
           pageTransition.style.transform = 'translateY(20px)';
           
           // Trigger animation after a tiny delay
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              pageTransition.classList.add('page-enter');
-              // Remove inline styles to allow CSS animation
-              setTimeout(() => {
-                pageTransition.style.opacity = '';
-                pageTransition.style.transform = '';
-                pageTransition.classList.remove('page-enter');
-              }, 500);
+              if (pageTransition) {
+                pageTransition.classList.add('page-enter');
+                // Remove inline styles to allow CSS animation
+                setTimeout(() => {
+                  if (pageTransition) {
+                    pageTransition.style.opacity = '';
+                    pageTransition.style.transform = '';
+                    pageTransition.classList.remove('page-enter');
+                  }
+                }, 500);
+              }
             });
           });
         }
+        
+        // Initialize on page load
+        initPageTransition();
+        
+        // Handle browser back/forward navigation (pageshow event)
+        window.addEventListener('pageshow', (event) => {
+          // If page was restored from cache (back/forward button)
+          if (event.persisted) {
+            // Reset page transition to visible state
+            if (pageTransition) {
+              pageTransition.style.opacity = '';
+              pageTransition.style.transform = '';
+              pageTransition.style.transition = '';
+              pageTransition.classList.add('page-enter');
+            }
+          }
+        });
+        
+        // Fallback: Ensure page is visible after a delay (safety net)
+        setTimeout(() => {
+          if (pageTransition && pageTransition.style.opacity === '0') {
+            pageTransition.style.opacity = '';
+            pageTransition.style.transform = '';
+            pageTransition.classList.add('page-enter');
+          }
+        }, 1000);
 
         // Handle navigation clicks for smooth transitions
         document.addEventListener('click', (e) => {
