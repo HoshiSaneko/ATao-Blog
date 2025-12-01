@@ -1,0 +1,391 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:wght@300;400;700&family=Google+Sans+Text:wght@400;500;600&family=Roboto:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern background gradient - 配置在 config.ts 的 THEME_COLORS 中 */
+body {
+  background: linear-gradient(135deg, #FAFBFC 0%, #F5F7FA 100%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background: linear-gradient(135deg, #0A0B0E 0%, #0D0E12 100%);
+  background-attachment: fixed;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(107, 114, 128, 0.8);
+}
+
+/* Selection */
+::selection {
+  background-color: rgb(191, 219, 254);
+}
+
+.dark ::selection {
+  background-color: rgb(30, 58, 138);
+}
+
+/* Hide scrollbar for clean loading */
+.no-scroll {
+  overflow: hidden;
+}
+
+/* Page transition animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+#page-transition {
+  min-height: 100vh;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* Removed conflicting list marker styles */
+/* ul li::marker { ... } */
+
+
+/* Hierarchical Ordered List styles */
+/* Reset counter at article level, so all lists continue counting */
+article {
+  counter-reset: list-item 0;
+}
+
+/* Also reset in markdown content container */
+.markdown-content {
+  counter-reset: list-item 0;
+}
+
+/* CRITICAL: Ensure ALL ol elements NEVER reset the counter - use universal selector */
+ol,
+article ol,
+article .markdown-content ol,
+.markdown-content ol,
+article ol ol,
+article .markdown-content ol ol,
+.markdown-content ol ol,
+article ol ol ol,
+article .markdown-content ol ol ol,
+.markdown-content ol ol ol,
+* ol {
+  list-style-type: none !important;
+  counter-reset: none !important;
+}
+
+ol>li {
+  counter-increment: list-item;
+  position: relative;
+  padding-left: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+ol>li.has-list-number {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+/* Unordered list items - same alignment as ordered lists */
+ul>li.standard-list-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  position: relative;
+  padding-left: 0;
+}
+
+/* Adjust bullet point position for baseline alignment */
+ul>li.standard-list-item::before {
+  top: 0.5em !important;
+  transform: translateY(0) !important;
+  align-self: baseline;
+}
+
+/* Task list items - ensure consistent spacing and alignment */
+ul > li.task-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+ul > li.task-list-item > input[type="checkbox"] {
+  flex-shrink: 0;
+}
+
+ul > li.task-list-item > *:not(input[type="checkbox"]):not(ul):not(ol) {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Nested lists in task items should be on a new line */
+ul > li.task-list-item > ul,
+ul > li.task-list-item > ol {
+  flex-basis: 100%;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 1.5rem;
+}
+
+/* Ensure nested task list items have consistent spacing */
+ul ul > li.task-list-item,
+ul ul ul > li.task-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Nested lists - ensure proper indentation and spacing */
+ul ul,
+ol ul,
+ul ol,
+ol ol {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 1.5rem;
+  margin-right: 0;
+}
+
+/* Ensure nested list items maintain flex layout */
+ul ul>li.standard-list-item,
+ol ul>li.standard-list-item,
+ul ol>li,
+ol ol>li {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  position: relative;
+  padding-left: 0;
+}
+
+/* Ensure nested ordered list items also get numbered */
+ol ol>li.has-list-number {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+/* Ensure content after list-number can wrap properly */
+ol>li.has-list-number {
+  flex-wrap: wrap;
+}
+
+ol>li.has-list-number > *:not(.list-number):not(ol):not(ul) {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Nested lists should be full width and on a new line */
+ol>li.has-list-number > ol,
+ol>li.has-list-number > ul {
+  flex-basis: 100%;
+  width: 100%;
+  margin-top: 0.5rem;
+  margin-left: 1.5rem;
+}
+
+/* Ensure content after bullet/number can wrap properly, including nested lists */
+ul>li.standard-list-item {
+  flex-wrap: wrap;
+}
+
+ul>li.standard-list-item > *:not(::before):not(ul):not(ol) {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Nested lists should be full width and properly indented */
+ul>li.standard-list-item > ul,
+ul>li.standard-list-item > ol,
+ol>li > ul,
+ol>li > ol {
+  flex-basis: 100%;
+  width: 100%;
+  margin-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Hide CSS counter by default - we use JavaScript for numbering */
+ol>li::before {
+  display: none;
+}
+
+/* Show CSS counter only if JavaScript hasn't added .list-number (fallback) */
+ol>li:not(.has-list-number)::before {
+  content: counter(list-item) ".";
+  position: absolute;
+  right: 100%;
+  margin-right: 0.5em;
+  color: #4285F4;
+  /* docs.accent */
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1.375;
+  text-align: right;
+  top: 0.15em;
+  display: block;
+}
+
+/* Hide ::before when we have a manual .list-number span */
+ol>li.has-list-number::before {
+  display: none !important;
+}
+
+/* Style for manual list numbers - inline with content */
+.list-number {
+  display: inline-block;
+  color: #4285F4;
+  font-weight: 500;
+  margin-right: 0.5em;
+  flex-shrink: 0;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+.dark .list-number {
+  color: #60A5FA;
+}
+
+.dark ol>li::before {
+  color: #60A5FA;
+  /* dark.accent */
+}
+
+/* Code block expand/collapse button animation */
+@keyframes bounce-subtle {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+
+  50% {
+    transform: translate(-50%, -3px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Custom tooltip styles */
+.tooltip-arrow-top::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgb(15, 23, 42);
+  /* slate-900 */
+  transition: opacity 0.2s ease-in-out;
+}
+
+.dark .tooltip-arrow-top::after {
+  border-top-color: rgb(51, 65, 85);
+  /* slate-700 */
+}
+
+.tooltip-arrow-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: rgb(15, 23, 42);
+  /* slate-900 */
+  transition: opacity 0.2s ease-in-out;
+}
+
+.dark .tooltip-arrow-bottom::after {
+  border-bottom-color: rgb(51, 65, 85);
+  /* slate-700 */
+}
+
+/* Table styles with adaptive row height and column width */
+table {
+  table-layout: auto;
+  width: 100%;
+}
+
+table th,
+table td {
+  min-width: 100px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+table th {
+  white-space: nowrap;
+}
+
+table td {
+  white-space: normal;
+  vertical-align: top;
+}
+
+/* Code block font override */
+pre[class*="language-"],
+code[class*="language-"],
+pre code {
+  font-family: "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace !important;
+  font-weight: 400 !important;
+}
+
+/* Inline code - use same font family as body text but with monospace fallback */
+code:not(pre code):not([class*="language-"]) {
+  font-family: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-weight: 400 !important;
+}

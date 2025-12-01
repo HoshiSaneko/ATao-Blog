@@ -1,0 +1,79 @@
+---
+import '../styles/global.css';
+import { BLOG_NAME, SITE_DESCRIPTION } from '../config';
+import LoadingScreen from '../components/LoadingScreen.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = BLOG_NAME, description = SITE_DESCRIPTION } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN" class="antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body class="text-docs-text dark:text-dark-text transition-colors duration-500 ease-in-out">
+    <LoadingScreen />
+    <div id="page-transition" class="page-enter min-h-screen flex flex-col">
+      <slot />
+    </div>
+    <script>
+      // Handle page transitions
+      (function() {
+        const pageTransition = document.getElementById('page-transition');
+        
+        // Add fade-in animation on page load
+        if (pageTransition) {
+          // Start with opacity 0
+          pageTransition.style.opacity = '0';
+          pageTransition.style.transform = 'translateY(20px)';
+          
+          // Trigger animation after a tiny delay
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              pageTransition.classList.add('page-enter');
+              // Remove inline styles to allow CSS animation
+              setTimeout(() => {
+                pageTransition.style.opacity = '';
+                pageTransition.style.transform = '';
+                pageTransition.classList.remove('page-enter');
+              }, 500);
+            });
+          });
+        }
+
+        // Handle navigation clicks for smooth transitions
+        document.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement;
+          const link = target.closest('a[href]') as HTMLAnchorElement;
+          
+          if (link && link.href && !link.target && !link.download && !link.hasAttribute('data-no-transition')) {
+            try {
+              const url = new URL(link.href);
+              // Only handle internal links
+              if (url.origin === window.location.origin && url.pathname !== window.location.pathname) {
+                if (pageTransition) {
+                  // Add fade-out before navigation
+                  pageTransition.style.opacity = '0';
+                  pageTransition.style.transform = 'translateY(-10px)';
+                  pageTransition.style.transition = 'opacity 0.25s ease-out, transform 0.25s ease-out';
+                }
+              }
+            } catch (e) {
+              // Invalid URL, ignore
+            }
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
+

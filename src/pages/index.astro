@@ -1,0 +1,593 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import PostCard from '../components/PostCard';
+import ParticlesBackground from '../components/ParticlesBackground';
+import TagFilters from '../components/TagFilters';
+import { BLOG_NAME, SITE_DESCRIPTION, HOME_PAGE, NAVBAR, FEATURES } from '../config';
+import { Search } from 'lucide-react';
+import { calculateReadingTime } from '../utils/readingTime';
+
+// Function to convert markdown to plain text for search
+function markdownToPlainText(markdown: string): string {
+  return markdown
+    // Remove code blocks
+    .replace(/```[\s\S]*?```/g, '')
+    // Remove inline code
+    .replace(/`[^`]+`/g, '')
+    // Remove images
+    .replace(/!\[([^\]]*)\]\([^\)]+\)/g, '')
+    // Remove links but keep text
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    // Remove headers
+    .replace(/^#{1,6}\s+(.+)$/gm, '$1')
+    // Remove bold/italic markers
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/_([^_]+)_/g, '$1')
+    // Remove horizontal rules
+    .replace(/^---$/gm, '')
+    // Remove list markers
+    .replace(/^[\s]*[-*+]\s+/gm, '')
+    .replace(/^[\s]*\d+\.\s+/gm, '')
+    // Remove blockquotes
+    .replace(/^>\s+/gm, '')
+    // Remove HTML tags
+    .replace(/<[^>]+>/g, '')
+    // Clean up multiple spaces and newlines
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const allPosts = await getCollection('blog');
+const posts = allPosts.sort((a, b) => {
+  const dateA = new Date(a.data.date.replace(/年|月|日/g, '/'));
+  const dateB = new Date(b.data.date.replace(/年|月|日/g, '/'));
+  return dateB.getTime() - dateA.getTime();
+});
+
+// Get all unique tags
+const allTags = Array.from(new Set(posts.flatMap(post => post.data.tags))).sort();
+
+// Get posts per page from config
+const postsPerPage = HOME_PAGE.postsPerPage;
+---
+
+<BaseLayout title={BLOG_NAME}>
+  <div class="min-h-screen relative flex flex-col" id="app">
+    {HOME_PAGE.showParticles && FEATURES.particles && <ParticlesBackground client:load />}
+    
+    <Navbar 
+      client:load
+      currentPath="/"
+      searchQuery=""
+      setSearchQuery={() => {}}
+    />
+
+    <main class="flex-1 flex flex-col relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 z-10 overflow-x-hidden">
+      <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div class="text-center py-6 sm:py-8">
+          <div id="search-header" class="hidden">
+            <p class="text-slate-500 dark:text-slate-400 mb-2 text-sm font-medium uppercase tracking-widest">搜索结果</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white font-serif" id="search-query"></h1>
+          </div>
+          <div id="normal-header">
+            <div class="relative w-full max-w-4xl mx-auto">
+              <div class="relative">
+                <div class="space-y-4 w-full max-w-xl mx-auto">
+                  {(() => {
+                    const verse = HOME_PAGE.verse;
+                    // 尝试按换行符分割
+                    if (verse.includes('\n')) {
+                      const parts = verse.split('\n');
+                      return (
+                        <>
+                          <div class="text-left">
+                            <span class="text-3xl sm:text-5xl font-bold text-slate-900 dark:text-white font-serif">{parts[0]}</span>
+                          </div>
+                            <div class="text-left pl-24 sm:pl-32">
+                              <span class="text-3xl sm:text-5xl font-bold text-slate-900 dark:text-white font-serif">{parts[1] || ''}</span>
+                            </div>
+                        </>
+                      );
+                    }
+                    // 默认显示整句
+                    return (
+                      <div class="text-left">
+                        <span class="text-3xl sm:text-5xl font-bold text-slate-900 dark:text-white font-serif">{verse}</span>
+                      </div>
+                    );
+                  })()}
+                </div>
+                <p class="text-right text-sm sm:text-base text-slate-500 dark:text-slate-400 font-serif italic mt-4 mr-8 sm:mr-12">
+                  — {HOME_PAGE.source}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative">
+          {/* 右侧标签筛选器 */}
+          {HOME_PAGE.showTagFilters && <TagFilters client:load tags={allTags} />}
+          
+          {/* 文章列表 */}
+          <div class="grid grid-cols-1 gap-8 min-h-[200px]" id="posts-container" data-posts-per-page={postsPerPage}>
+          {posts.map((post) => {
+            const plainTextContent = markdownToPlainText(post.body);
+            return (
+            <div
+              data-post-card
+              data-title={post.data.title}
+              data-tags={post.data.tags.join(' ')}
+              data-description={post.data.summary || ''}
+              data-content={plainTextContent}
+              data-post-id={post.id}
+            >
+              <PostCard 
+                client:load
+                post={{
+                  id: post.id,
+                  title: post.data.title,
+                  summary: post.data.summary,
+                  date: post.data.date,
+                  tags: post.data.tags,
+                  readingTime: post.data.readingTime || calculateReadingTime(post.body),
+                  slug: post.slug,
+                }}
+              />
+            </div>
+            );
+          })}
+          </div>
+          
+          {/* 分页控件 */}
+          {postsPerPage > 0 && (
+            <div id="pagination" class="hidden flex flex-wrap items-center justify-center gap-1.5 mt-12 mb-8">
+              {/* Page numbers will be dynamically generated by JavaScript */}
+            </div>
+          )}
+        </div>
+
+        <div id="no-results" class="hidden flex-col items-center justify-center py-12 text-center animate-in fade-in">
+          <div class="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4 text-slate-400">
+            <Search size={24} />
+          </div>
+          <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">未找到文章</h3>
+          <p class="text-slate-500 dark:text-slate-400 mb-6 max-w-md" id="no-results-message"></p>
+          <button 
+            id="clear-filters"
+            class="px-4 py-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
+          >
+            清除所有筛选
+          </button>
+        </div>
+      </div>
+
+      <Footer client:load />
+    </main>
+  </div>
+
+  <script>
+    // Search and filter state
+    // 优先从 sessionStorage 获取搜索内容（更快的恢复），其次从 URL 参数获取
+    let initialSearchQuery = '';
+    try {
+      // 尝试从 sessionStorage 获取
+      const pendingQuery = sessionStorage.getItem('pendingSearchQuery');
+      if (pendingQuery) {
+        initialSearchQuery = pendingQuery;
+        // 清除 sessionStorage，避免下次加载时重复使用
+        sessionStorage.removeItem('pendingSearchQuery');
+      } else {
+        // 如果没有 sessionStorage，从 URL 参数获取
+        const urlParams = new URLSearchParams(window.location.search);
+        initialSearchQuery = urlParams.get('q') || '';
+      }
+    } catch (e) {
+      // sessionStorage 不可用，从 URL 参数获取
+      const urlParams = new URLSearchParams(window.location.search);
+      initialSearchQuery = urlParams.get('q') || '';
+    }
+    
+    let searchQuery = initialSearchQuery;
+    let selectedTag: string | null = null;
+    let currentPage = 1;
+    const postsContainer = document.getElementById('posts-container');
+    const postsPerPage = postsContainer ? parseInt(postsContainer.dataset.postsPerPage || '0') : 0;
+    
+    // 如果 URL 中有搜索参数，自动打开搜索框并设置搜索内容
+    // 立即设置搜索状态，不等待 DOM 加载，以获得更好的用户体验
+    if (initialSearchQuery) {
+      // 立即触发搜索更新事件，让搜索逻辑立即执行
+      // 这样即使页面还在加载，搜索也会立即生效
+      const initSearch = () => {
+        // 先触发搜索更新事件，这会自动打开搜索框（通过 Navbar 的事件监听器）
+        window.dispatchEvent(new CustomEvent('search-updated', {
+          detail: { query: initialSearchQuery }
+        }));
+        
+        // 额外确保搜索框打开（如果 Navbar 已渲染但事件未触发打开）
+        setTimeout(() => {
+          const searchButton = document.querySelector('button[aria-label="Open search"]') as HTMLButtonElement;
+          const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+          // 如果搜索框未打开，手动点击按钮
+          if (searchButton && !searchInput) {
+            searchButton.click();
+          }
+          // 确保搜索输入框的值已设置
+          if (searchInput && searchInput.value !== initialSearchQuery) {
+            searchInput.value = initialSearchQuery;
+          }
+        }, 100);
+      };
+      
+      // 立即执行一次（如果 DOM 已准备好）
+      if (document.readyState !== 'loading') {
+        initSearch();
+      }
+      
+      // 也监听 DOMContentLoaded，确保在 DOM 准备好后再次执行（以防第一次执行时组件未挂载）
+      document.addEventListener('DOMContentLoaded', () => {
+        // 使用 requestAnimationFrame 确保在下一帧执行，给 React 组件时间挂载
+        requestAnimationFrame(() => {
+          requestAnimationFrame(initSearch);
+        });
+      });
+    }
+    
+    // Get all posts data
+    function getPostsData() {
+      const postsData: Array<{id: string, title: string, tags: string[], content: string, element: HTMLElement | null}> = [];
+      document.querySelectorAll('[data-post-card]').forEach(card => {
+        const id = (card as HTMLElement).dataset.postId || '';
+        const title = (card as HTMLElement).dataset.title || '';
+        const tags = (card as HTMLElement).dataset.tags?.split(' ') || [];
+        const content = (card as HTMLElement).dataset.content || '';
+        postsData.push({ id, title, tags, content, element: card as HTMLElement });
+      });
+      return postsData;
+    }
+    
+    function updateFilters() {
+      const query = searchQuery.toLowerCase().trim();
+      const tag = selectedTag;
+      
+      // Reset to first page when filters change
+      currentPage = 1;
+      
+      // Update header
+      const searchHeader = document.getElementById('search-header');
+      const normalHeader = document.getElementById('normal-header');
+      const searchQueryEl = document.getElementById('search-query');
+      
+      if (query) {
+        if (searchHeader) searchHeader.classList.remove('hidden');
+        if (normalHeader) normalHeader.classList.add('hidden');
+        if (searchQueryEl) searchQueryEl.textContent = `"${query}"`;
+      } else {
+        if (searchHeader) searchHeader.classList.add('hidden');
+        if (normalHeader) normalHeader.classList.remove('hidden');
+      }
+      
+      // Filter posts
+      const postsData = getPostsData();
+      const visiblePosts: Array<{title: string, tags: string[], element: HTMLElement}> = [];
+      
+      postsData.forEach(({ title, tags, content, element }) => {
+        const matchesSearch = !query || 
+          title.toLowerCase().includes(query) || 
+          tags.some(t => t.toLowerCase().includes(query)) ||
+          content.toLowerCase().includes(query);
+        
+        const matchesTag = !tag || tags.includes(tag);
+        
+        const matches = matchesSearch && matchesTag;
+        
+        if (element) {
+          if (matches) {
+            visiblePosts.push({ title, tags, element });
+          }
+          // Initially hide all, we'll show the ones for current page
+          element.style.display = 'none';
+        }
+      });
+      
+      const visibleCount = visiblePosts.length;
+      
+      // Apply pagination if enabled
+      if (postsPerPage > 0 && visibleCount > 0) {
+        const totalPages = Math.ceil(visibleCount / postsPerPage);
+        const startIndex = (currentPage - 1) * postsPerPage;
+        const endIndex = startIndex + postsPerPage;
+        const postsToShow = visiblePosts.slice(startIndex, endIndex);
+        
+        // Show only posts for current page
+        postsToShow.forEach(({ element }) => {
+          if (element) element.style.display = '';
+        });
+        
+        // Update pagination controls
+        updatePagination(totalPages);
+      } else {
+        // No pagination, show all visible posts
+        visiblePosts.forEach(({ element }) => {
+          if (element) element.style.display = '';
+        });
+        
+        // Hide pagination
+        const pagination = document.getElementById('pagination');
+        if (pagination) pagination.classList.add('hidden');
+      }
+      
+      // Show/hide no results message
+      const noResults = document.getElementById('no-results');
+      const noResultsMessage = document.getElementById('no-results-message');
+      const postsContainer = document.getElementById('posts-container');
+      
+      if (visibleCount === 0) {
+        if (noResults) noResults.classList.remove('hidden');
+        if (postsContainer) postsContainer.classList.add('hidden');
+        const pagination = document.getElementById('pagination');
+        if (pagination) pagination.classList.add('hidden');
+        if (noResultsMessage) {
+          if (query && tag) {
+            noResultsMessage.textContent = `没有找到同时包含 "${query}" 且带有标签 "${tag}" 的文章。`;
+          } else if (query) {
+            noResultsMessage.textContent = `没有找到包含 "${query}" 的文章。`;
+          } else if (tag) {
+            noResultsMessage.textContent = `没有找到带有标签 "${tag}" 的文章。`;
+          }
+        }
+      } else {
+        if (noResults) noResults.classList.add('hidden');
+        if (postsContainer) postsContainer.classList.remove('hidden');
+      }
+      
+      // Update tag filter buttons
+      document.querySelectorAll('[data-tag-filter]').forEach(btn => {
+        const btnTag = (btn as HTMLElement).dataset.tagFilter || null;
+        const isAllBtn = btnTag === '';
+        const isActive = (selectedTag === null && isAllBtn) || (selectedTag === btnTag);
+        
+        const activeClasses = [
+          'bg-slate-800', 'text-white', 'border-slate-800',
+          'dark:bg-white', 'dark:text-slate-900', 'dark:border-white',
+          'shadow-md',
+          // Override hover styles for active state to ensure readability
+          'hover:bg-slate-900', 'hover:text-white', 'hover:border-slate-900',
+          'dark:hover:bg-slate-100', 'dark:hover:text-slate-900', 'dark:hover:border-white'
+        ];
+        
+        const inactiveClasses = [
+          'bg-transparent', 'text-slate-600', 'border-slate-200',
+          'dark:text-slate-400', 'dark:border-white/10',
+          'hover:bg-slate-50', 'hover:border-docs-accent/50', 'hover:text-docs-accent',
+          'dark:hover:bg-white/5', 'dark:hover:border-dark-accent/50', 'dark:hover:text-dark-accent'
+        ];
+
+        // Remove all potential classes first to ensure clean state switch
+        btn.classList.remove(...activeClasses);
+        btn.classList.remove(...inactiveClasses);
+
+        if (isActive) {
+          btn.classList.add(...activeClasses);
+        } else {
+          btn.classList.add(...inactiveClasses);
+        }
+      });
+    }
+    
+    function updatePagination(totalPages: number) {
+      const pagination = document.getElementById('pagination');
+      
+      if (!pagination) return;
+      
+      // Show pagination if there's more than one page
+      if (totalPages > 1) {
+        pagination.classList.remove('hidden');
+      } else {
+        pagination.classList.add('hidden');
+        return;
+      }
+      
+      // Clear existing content
+      pagination.innerHTML = '';
+      
+      // Helper function to create page button
+      const createPageButton = (pageNum: number, isActive: boolean = false, isEllipsis: boolean = false) => {
+        const button = document.createElement('button');
+        
+        if (isEllipsis) {
+          button.textContent = '…';
+          button.disabled = true;
+          button.className = 'w-9 h-9 flex items-center justify-center text-sm font-medium text-slate-400 dark:text-slate-500 cursor-default';
+        } else {
+          button.textContent = pageNum.toString();
+          button.className = `w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 ${
+            isActive
+              ? 'bg-docs-accent text-white dark:bg-dark-accent shadow-sm scale-105'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:scale-105 active:scale-95'
+          }`;
+          
+          if (!isActive) {
+            button.addEventListener('click', () => {
+              goToPage(pageNum);
+            });
+          }
+        }
+        
+        return button;
+      };
+      
+      // Helper function to create arrow button
+      const createArrowButton = (direction: 'prev' | 'next', disabled: boolean) => {
+        const button = document.createElement('button');
+        button.className = `w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 ${
+          disabled
+            ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:scale-105 active:scale-95'
+        }`;
+        button.disabled = disabled;
+        
+        // Create SVG icon
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '16');
+        svg.setAttribute('height', '16');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        svg.setAttribute('stroke-linecap', 'round');
+        svg.setAttribute('stroke-linejoin', 'round');
+        
+        const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        polyline.setAttribute('points', direction === 'prev' ? '15 18 9 12 15 6' : '9 18 15 12 9 6');
+        
+        svg.appendChild(polyline);
+        button.appendChild(svg);
+        
+        if (!disabled) {
+          button.addEventListener('click', () => {
+            goToPage(direction === 'prev' ? currentPage - 1 : currentPage + 1);
+          });
+        }
+        
+        return button;
+      };
+      
+      // Generate page numbers with ellipsis logic
+      const pageNumbers: (number | 'ellipsis')[] = [];
+      
+      if (totalPages <= 7) {
+        // Show all pages if 7 or fewer
+        for (let i = 1; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        // Always show first page
+        pageNumbers.push(1);
+        
+        if (currentPage <= 3) {
+          // Near the start
+          pageNumbers.push(2, 3, 4, 'ellipsis', totalPages);
+        } else if (currentPage >= totalPages - 2) {
+          // Near the end
+          pageNumbers.push('ellipsis', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+        } else {
+          // In the middle
+          pageNumbers.push('ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis', totalPages);
+        }
+      }
+      
+      // Add prev button
+      pagination.appendChild(createArrowButton('prev', currentPage === 1));
+      
+      // Add page number buttons
+      pageNumbers.forEach((pageNum) => {
+        if (pageNum === 'ellipsis') {
+          pagination.appendChild(createPageButton(0, false, true));
+        } else {
+          pagination.appendChild(createPageButton(pageNum, pageNum === currentPage));
+        }
+      });
+      
+      // Add next button
+      pagination.appendChild(createArrowButton('next', currentPage === totalPages));
+    }
+    
+    function goToPage(page: number) {
+      const query = searchQuery.toLowerCase().trim();
+      const tag = selectedTag;
+      const postsData = getPostsData();
+      const visiblePosts: Array<{title: string, tags: string[], element: HTMLElement}> = [];
+      
+      // Get visible posts
+      postsData.forEach(({ title, tags, content, element }) => {
+        const matchesSearch = !query || 
+          title.toLowerCase().includes(query) || 
+          tags.some(t => t.toLowerCase().includes(query)) ||
+          content.toLowerCase().includes(query);
+        
+        const matchesTag = !tag || tags.includes(tag);
+        
+        const matches = matchesSearch && matchesTag;
+        
+        if (element && matches) {
+          visiblePosts.push({ title, tags, element });
+        }
+      });
+      
+      const totalPages = Math.ceil(visiblePosts.length / postsPerPage);
+      if (page < 1 || page > totalPages) return;
+      
+      currentPage = page;
+      
+      // Hide all posts first
+      postsData.forEach(({ element }) => {
+        if (element) element.style.display = 'none';
+      });
+      
+      // Show posts for current page
+      const startIndex = (currentPage - 1) * postsPerPage;
+      const endIndex = startIndex + postsPerPage;
+      const postsToShow = visiblePosts.slice(startIndex, endIndex);
+      
+      postsToShow.forEach(({ element }) => {
+        if (element) element.style.display = '';
+      });
+      
+      // Update pagination controls
+      updatePagination(totalPages);
+      
+      // Scroll to top of posts container
+      const postsContainer = document.getElementById('posts-container');
+      if (postsContainer) {
+        postsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    
+    // 监听标签过滤变化
+    window.addEventListener('tag-filter-changed', ((e: CustomEvent) => {
+      const tag = e.detail.tag === '' ? null : e.detail.tag;
+      selectedTag = tag;
+      updateFilters();
+    }) as EventListener);
+    
+    // Listen for search updates from Navbar
+    window.addEventListener('search-updated', ((e: CustomEvent) => {
+      searchQuery = e.detail.query;
+      updateFilters();
+    }) as EventListener);
+    
+    // 发送初始标签过滤事件以确保状态同步
+    window.dispatchEvent(new CustomEvent('tag-filter-changed', { 
+      detail: { tag: '' } 
+    }));
+    
+    // Clear filters button
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    if (clearFiltersBtn) {
+      clearFiltersBtn.addEventListener('click', () => {
+        searchQuery = '';
+        selectedTag = null;
+        const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+        if (searchInput) searchInput.value = '';
+        updateFilters();
+      });
+    }
+    
+    // Listen for search from Navbar (via custom event)
+    window.addEventListener('search-updated', ((e: CustomEvent) => {
+      searchQuery = e.detail.query;
+      updateFilters();
+    }) as EventListener);
+    
+    // Initialize styles
+    updateFilters();
+  </script>
+</BaseLayout>
+

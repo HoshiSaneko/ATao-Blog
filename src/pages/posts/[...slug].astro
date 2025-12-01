@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import MarkdownRenderer from '../../components/MarkdownRenderer';
+import AuthorCard from '../../components/AuthorCard';
+import ParticlesBackground from '../../components/ParticlesBackground';
+import ProgressBar from '../../components/ProgressBar';
+import TableOfContents from '../../components/TableOfContents';
+import ScrollToTop from '../../components/ScrollToTop';
+import Comment from '../../components/Comment';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { calculateReadingTime } from '../../utils/readingTime';
+import { FEATURES } from '../../config';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const allPosts = await getCollection('blog');
+const sortedPosts = allPosts.sort((a, b) => {
+  const dateA = new Date(a.data.date.replace(/年|月|日/g, '/'));
+  const dateB = new Date(b.data.date.replace(/年|月|日/g, '/'));
+  return dateB.getTime() - dateA.getTime();
+});
+
+const currentIndex = sortedPosts.findIndex(p => p.slug === post.slug);
+const prevPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+const nextPost = currentIndex !== -1 && currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+
+const readingTime = post.data.readingTime || calculateReadingTime(post.body);
+---
+
+<BaseLayout title={`${post.data.title} | ${post.data.title}`}>
+  <div class="min-h-screen relative flex flex-col">
+    {FEATURES.readingProgress && <ProgressBar client:load />}
+    {FEATURES.tableOfContents && <TableOfContents client:load />}
+    {FEATURES.scrollToTop && <ScrollToTop client:load />}
+    {FEATURES.particles && <ParticlesBackground client:load />}
+    
+    <Navbar 
+      client:load
+      currentPath={`/posts/${post.slug}`}
+      searchQuery=""
+      setSearchQuery={() => {}}
+    />
+
+    <main class="flex-1 flex flex-col relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 z-10 overflow-x-hidden">
+      <div class="animate-in fade-in slide-in-from-bottom-8 duration-500">
+        <a 
+          href="/"
+          class="group mb-8 flex items-center gap-2 text-slate-500 hover:text-docs-accent dark:text-slate-400 dark:hover:text-dark-accent transition-colors"
+        >
+          <div class="p-2 rounded-full bg-white dark:bg-white/5 shadow-sm border border-slate-100 dark:border-white/5 group-hover:-translate-x-1 transition-transform">
+            <ArrowLeft size={18} />
+          </div>
+          <span class="text-sm font-medium">返回列表</span>
+        </a>
+
+        <article class="bg-white/80 dark:bg-dark-paper/80 backdrop-blur-sm rounded-3xl shadow-sm dark:shadow-none border border-slate-100/50 dark:border-white/5 p-8 sm:p-12 md:p-16" style="will-change: scroll-position; contain: layout style paint; content-visibility: auto; contain-intrinsic-size: auto 500px;">
+          <header class="mb-12 border-b border-slate-100 dark:border-slate-800 pb-8">
+            <div class="flex flex-wrap gap-3 mb-6">
+              {post.data.tags.map(tag => (
+                <span class="px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white font-serif leading-tight mb-6">
+              {post.data.title}
+            </h1>
+            <div class="flex items-center gap-4 text-slate-400 text-sm font-medium">
+              <span>{post.data.date}</span>
+              <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+              <span>{readingTime}</span>
+            </div>
+          </header>
+
+          <MarkdownRenderer client:load content={post.body} />
+
+          <div class="mt-12 pt-12 border-t-2 border-slate-200 dark:border-slate-700">
+            <AuthorCard client:load title={post.data.title} summary={post.data.summary} />
+          </div>
+          
+          <div class="mt-12 pt-8 border-t border-slate-100 dark:border-white/5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
+              <div class="flex justify-start">
+                {prevPost ? (
+                  <a
+                    href={`/posts/${prevPost.slug}`}
+                    class="group w-full text-left p-4 -ml-4 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-200"
+                  >
+                    <div class="flex items-center gap-2 text-slate-400 mb-2 text-xs font-bold uppercase tracking-wider group-hover:text-docs-accent dark:group-hover:text-dark-accent">
+                      <ArrowLeft size={14} /> 上一篇
+                    </div>
+                    <div class="text-slate-700 dark:text-slate-200 font-serif font-bold line-clamp-2 group-hover:text-docs-accent dark:group-hover:text-dark-accent">
+                      {prevPost.data.title}
+                    </div>
+                  </a>
+                ) : <div />}
+              </div>
+
+              <div class="flex justify-end">
+                {nextPost ? (
+                  <a
+                    href={`/posts/${nextPost.slug}`}
+                    class="group w-full text-right p-4 -mr-4 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-200"
+                  >
+                    <div class="flex items-center gap-2 justify-end text-slate-400 mb-2 text-xs font-bold uppercase tracking-wider group-hover:text-docs-accent dark:group-hover:text-dark-accent">
+                      下一篇 <ArrowRight size={14} />
+                    </div>
+                    <div class="text-slate-700 dark:text-slate-200 font-serif font-bold line-clamp-2 group-hover:text-docs-accent dark:group-hover:text-dark-accent">
+                      {nextPost.data.title}
+                    </div>
+                  </a>
+                ) : <div />}
+              </div>
+            </div>
+          </div>
+
+          <Comment client:load />
+        </article>
+      </div>
+
+      <Footer client:load />
+    </main>
+  </div>
+
+</BaseLayout>
+

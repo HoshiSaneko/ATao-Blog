@@ -1,0 +1,58 @@
+---
+---
+<div id="loading-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-[#0F1117]/60 backdrop-blur-lg transition-opacity duration-700">
+  <div class="relative flex flex-col items-center justify-center p-8">
+    
+    <!-- Spinner Container -->
+    <div class="relative mb-8">
+      <!-- Pulse Ring (Glow) -->
+      <div class="absolute inset-0 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
+      
+      <!-- Spinning SVG -->
+      <div class="relative w-20 h-20">
+        <svg class="w-full h-full animate-spin-slow" viewBox="0 0 100 100">
+          <!-- Track -->
+          <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="1.5" class="text-slate-200 dark:text-white/5" />
+          <!-- Indicator -->
+          <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="100 200" stroke-linecap="round" class="text-docs-accent dark:text-dark-accent" />
+        </svg>
+        
+         <!-- Center Element - Logo -->
+         <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-10 h-10 bg-white dark:bg-white/10 rounded-lg shadow-sm border border-slate-100 dark:border-white/5 flex items-center justify-center backdrop-blur-md">
+              <span class="font-serif font-bold text-lg text-slate-800 dark:text-white">T</span>
+            </div>
+         </div>
+      </div>
+    </div>
+
+    <!-- Text Container -->
+    <div class="flex flex-col items-center gap-3 z-10">
+      <div class="flex items-center gap-2 opacity-0 animate-[fadeIn_1s_ease-out_0.2s_forwards]">
+         <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">
+           Loading T-Blog
+         </span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script is:inline>
+  // Ensure loading screen is visible initially (though CSS handles it)
+  // Listen for page load
+  window.addEventListener('load', () => {
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+          // Add fade out effect
+          loadingScreen.style.opacity = '0';
+          loadingScreen.style.pointerEvents = 'none'; // Disable interactions immediately
+          
+          // Remove from DOM or hide after transition
+          setTimeout(() => {
+              loadingScreen.style.display = 'none';
+          }, 700); // Match the duration-700 class
+      }
+  });
+</script>
+

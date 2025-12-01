@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import ParticlesBackground from '../components/ParticlesBackground';
+import ArchiveList from '../components/ArchiveList';
+import { BLOG_NAME, FEATURES } from '../config';
+
+const allPosts = await getCollection('blog');
+const posts = allPosts.sort((a, b) => {
+  const dateA = new Date(a.data.date.replace(/年|月|日/g, '/'));
+  const dateB = new Date(b.data.date.replace(/年|月|日/g, '/'));
+  return dateB.getTime() - dateA.getTime();
+});
+
+// Group posts by year and month
+interface PostsByYearMonth {
+  [year: string]: {
+    [month: string]: typeof posts;
+  };
+}
+
+const postsByYearMonth: PostsByYearMonth = posts.reduce((acc, post) => {
+  const year = post.data.date.substring(0, 4);
+  const month = post.data.date.substring(5, 7);
+  
+  if (!acc[year]) acc[year] = {};
+  if (!acc[year][month]) acc[year][month] = [];
+  
+  acc[year][month].push(post);
+  return acc;
+}, {} as PostsByYearMonth);
+
+// Convert to array format for the component
+const archiveData = Object.keys(postsByYearMonth)
+  .sort((a, b) => Number(b) - Number(a))
+  .map(year => ({
+    year,
+    months: Object.keys(postsByYearMonth[year])
+      .sort((a, b) => Number(b) - Number(a))
+      .map(month => ({
+        month,
+        posts: postsByYearMonth[year][month].map(post => ({
+          slug: post.slug,
+          title: post.data.title,
+          date: post.data.date,
+          tags: post.data.tags,
+        })),
+      })),
+  }));
+---
+
+<BaseLayout title={`归档 | ${BLOG_NAME}`}>
+  <div class="min-h-screen relative flex flex-col">
+    {FEATURES.particles && <ParticlesBackground client:load />}
+    
+    <Navbar 
+      client:load
+      currentPath="/archive"
+      searchQuery=""
+      setSearchQuery={() => {}}
+    />
+
+    <main class="flex-1 flex flex-col relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 z-10 overflow-x-hidden">
+      <div class="max-w-4xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-500">
+        <div class="text-center mb-12">
+          <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white font-serif mb-4">归档</h1>
+          <p class="text-lg text-slate-600 dark:text-slate-400 font-serif italic">
+            目前共收录 {posts.length} 篇文章。
+          </p>
+        </div>
+
+        <ArchiveList client:load archiveData={archiveData} />
+      </div>
+
+      <Footer client:load />
+    </main>
+  </div>
+
+</BaseLayout>

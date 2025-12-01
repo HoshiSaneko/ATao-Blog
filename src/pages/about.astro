@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import PostCard from '../components/PostCard';
+import AuthorCard from '../components/AuthorCard';
+import ParticlesBackground from '../components/ParticlesBackground';
+import { BLOG_NAME, FEATURES } from '../config';
+
+const allPosts = await getCollection('blog');
+const latestPosts = allPosts
+  .sort((a, b) => {
+    const dateA = new Date(a.data.date.replace(/年|月|日/g, '/'));
+    const dateB = new Date(b.data.date.replace(/年|月|日/g, '/'));
+    return dateB.getTime() - dateA.getTime();
+  })
+  .slice(0, 3);
+---
+
+<BaseLayout title={`关于 | ${BLOG_NAME}`}>
+  <div class="min-h-screen relative flex flex-col">
+    {FEATURES.particles && <ParticlesBackground client:load />}
+    
+    <Navbar 
+      client:load
+      currentPath="/about"
+      searchQuery=""
+      setSearchQuery={() => {}}
+    />
+
+    <main class="flex-1 flex flex-col relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 z-10 overflow-x-hidden">
+      <div class="animate-in fade-in slide-in-from-bottom-8 duration-500">
+        <div class="max-w-4xl mx-auto">
+          {/* 关于标题 */}
+          <div class="text-center mb-12">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white font-serif mb-4">关于</h1>
+          </div>
+          
+          {/* 个人信息卡片 */}
+          <div class="mb-16 flex justify-center">
+            <AuthorCard client:load className="max-w-3xl w-full" showLicense={false} />
+          </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto mt-16">
+          <div class="flex items-center gap-4 mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white font-serif">最新文章</h2>
+            <div class="h-px flex-grow bg-slate-200 dark:bg-white/10"></div>
+            <a href="/" class="text-sm font-medium text-docs-accent dark:text-dark-accent hover:underline">查看全部</a>
+          </div>
+          <div class="flex flex-col gap-6">
+            {latestPosts.map((post) => (
+              <PostCard 
+                client:load
+                post={{
+                  id: post.id,
+                  title: post.data.title,
+                  summary: post.data.summary,
+                  date: post.data.date,
+                  tags: post.data.tags,
+                  readingTime: post.data.readingTime,
+                  slug: post.slug,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <Footer client:load />
+    </main>
+  </div>
+
+</BaseLayout>
