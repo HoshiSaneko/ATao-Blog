@@ -7,6 +7,7 @@ import DisconnectedFriendsList from '../components/DisconnectedFriendsList';
 import SiteInfo from '../components/SiteInfo';
 import Comment from '../components/Comment';
 import ParticlesBackground from '../components/ParticlesBackground';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { FRIEND_LINKS } from '../friends';
 import { BLOG_NAME, FRIEND_LINK_CONTACT } from '../config';
 ---
@@ -33,10 +34,10 @@ import { BLOG_NAME, FRIEND_LINK_CONTACT } from '../config';
         </div>
 
         <!-- Friends List with Pagination -->
-        <FriendsList client:load links={FRIEND_LINKS} />
+        <FriendsList client:idle links={FRIEND_LINKS} />
 
         <!-- Disconnected Friends List -->
-        <DisconnectedFriendsList client:load links={FRIEND_LINKS} />
+        <DisconnectedFriendsList client:idle links={FRIEND_LINKS} />
 
         <!-- Apply Section - Redesigned -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">

@@ -1,0 +1,48 @@
+# Apache 服务器配置 - 处理路由重定向
+# 将所有请求重定向到对应的 index.html 文件
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # 首先确保静态资源（_astro 目录下的文件）可以直接访问
+  RewriteCond %{REQUEST_URI} ^/_astro/
+  RewriteRule ^ - [L]
+  
+  # 如果请求的是实际存在的文件，直接返回
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+  
+  # 如果请求的是实际存在的目录，直接返回
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  
+  # 对于其他所有请求，尝试查找对应的 index.html
+  # 例如：/link -> /link/index.html
+  RewriteCond %{REQUEST_URI} !^/$
+  RewriteCond %{REQUEST_URI} !\.(html|css|js|json|xml|svg|png|jpg|jpeg|gif|webp|ico|woff|woff2|ttf|eot)$
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ $1/index.html [L]
+  
+  # 如果请求根路径，返回 index.html
+  RewriteCond %{REQUEST_URI} ^/$
+  RewriteRule ^(.*)$ /index.html [L]
+</IfModule>
+
+# 设置缓存策略
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "0"
+  ExpiresByType text/css "1 year"
+  ExpiresByType application/javascript "1 year"
+  ExpiresByType image/png "1 year"
+  ExpiresByType image/jpeg "1 year"
+  ExpiresByType image/svg+xml "1 year"
+</IfModule>
+
+# 启用 Gzip 压缩
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+

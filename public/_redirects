@@ -1,0 +1,12 @@
+# Netlify/Vercel 重定向配置
+# 将所有路由重定向到对应的 index.html
+
+# 处理所有非文件请求
+/*    /index.html   200
+
+# 处理特定路径
+/link/*    /link/index.html   200
+/about/*    /about/index.html   200
+/archive/*    /archive/index.html   200
+/posts/*    /posts/*/index.html   200
+

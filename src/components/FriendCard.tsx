@@ -52,11 +52,11 @@ const FriendCard: React.FC<FriendCardProps> = ({ link }) => {
 
         observer.observe(imgRef.current);
 
-        // 备用机制：3秒后如果还没加载，强制加载
+        // 备用机制：1秒后如果还没加载，强制加载（减少等待时间）
         const fallbackTimer = setTimeout(() => {
             setShouldLoad(true);
             observer.disconnect();
-        }, 3000);
+        }, 1000);
 
         return () => {
             observer.disconnect();
@@ -92,10 +92,10 @@ const FriendCard: React.FC<FriendCardProps> = ({ link }) => {
         // 开始加载测试图片
         testImg.src = link.avatar;
         
-        // 超时处理（10秒）
+        // 超时处理（5秒，减少等待时间）
         const timeout = setTimeout(() => {
             complete(false);
-        }, 10000);
+        }, 5000);
 
         return () => {
             clearTimeout(timeout);
