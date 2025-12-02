@@ -159,4 +159,11 @@ export const FRIEND_LINKS: FriendLink[] = [
         avatar: "https://tools.aiqji.com/favicon.svg",
         addDate: "2025-11-15"
     },
+    {
+        name: "Nebula Blog",
+        description: "Nebula.SYS",
+        url: "https://www.996icu.eu.org/",
+        avatar: "https://img.scdn.io/i/692d847f79589_1764590719.webp",
+        addDate: "2025-12-02"
+    },
 ];
