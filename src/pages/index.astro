@@ -9,6 +9,7 @@ import TagFilters from '../components/TagFilters';
 import { BLOG_NAME, SITE_DESCRIPTION, HOME_PAGE, NAVBAR, FEATURES } from '../config';
 import { Search } from 'lucide-react';
 import { calculateReadingTime } from '../utils/readingTime';
+import { generateShortId } from '../utils/slug';
 
 // Function to convert markdown to plain text for search
 function markdownToPlainText(markdown: string): string {
@@ -136,7 +137,7 @@ const postsPerPage = HOME_PAGE.postsPerPage;
                   date: post.data.date,
                   tags: post.data.tags,
                   readingTime: post.data.readingTime || calculateReadingTime(post.body),
-                  slug: post.slug,
+                  slug: generateShortId(post.id),
                 }}
               />
             </div>

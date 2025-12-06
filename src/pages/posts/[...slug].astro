@@ -12,17 +12,22 @@ import ScrollToTop from '../../components/ScrollToTop';
 import Comment from '../../components/Comment';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { calculateReadingTime } from '../../utils/readingTime';
+import { generateShortId } from '../../utils/slug';
 import { FEATURES } from '../../config';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+  return posts.map((post) => {
+    // 使用文件路径生成短随机ID
+    const shortId = generateShortId(post.id);
+    return {
+      params: { slug: shortId },
+      props: { post, shortId },
+    };
+  });
 }
 
-const { post } = Astro.props;
+const { post, shortId } = Astro.props;
 const allPosts = await getCollection('blog');
 const sortedPosts = allPosts.sort((a, b) => {
   const dateA = new Date(a.data.date.replace(/年|月|日/g, '/'));
@@ -30,9 +35,13 @@ const sortedPosts = allPosts.sort((a, b) => {
   return dateB.getTime() - dateA.getTime();
 });
 
-const currentIndex = sortedPosts.findIndex(p => p.slug === post.slug);
+const currentIndex = sortedPosts.findIndex(p => generateShortId(p.id) === shortId);
 const prevPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
 const nextPost = currentIndex !== -1 && currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+
+// 为前后文章生成短ID
+const prevPostId = prevPost ? generateShortId(prevPost.id) : null;
+const nextPostId = nextPost ? generateShortId(nextPost.id) : null;
 
 const readingTime = post.data.readingTime || calculateReadingTime(post.body);
 ---
@@ -46,7 +55,7 @@ const readingTime = post.data.readingTime || calculateReadingTime(post.body);
     
     <Navbar 
       client:load
-      currentPath={`/posts/${post.slug}`}
+      currentPath={`/posts/${shortId}`}
       searchQuery=""
       setSearchQuery={() => {}}
     />
@@ -91,9 +100,9 @@ const readingTime = post.data.readingTime || calculateReadingTime(post.body);
           <div class="mt-12 pt-8 border-t border-slate-100 dark:border-white/5">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
               <div class="flex justify-start">
-                {prevPost ? (
+                {prevPost && prevPostId ? (
                   <a
-                    href={`/posts/${prevPost.slug}`}
+                    href={`/posts/${prevPostId}`}
                     class="group w-full text-left p-4 -ml-4 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-200"
                   >
                     <div class="flex items-center gap-2 text-slate-400 mb-2 text-xs font-bold uppercase tracking-wider group-hover:text-docs-accent dark:group-hover:text-dark-accent">
@@ -107,9 +116,9 @@ const readingTime = post.data.readingTime || calculateReadingTime(post.body);
               </div>
 
               <div class="flex justify-end">
-                {nextPost ? (
+                {nextPost && nextPostId ? (
                   <a
-                    href={`/posts/${nextPost.slug}`}
+                    href={`/posts/${nextPostId}`}
                     class="group w-full text-right p-4 -mr-4 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-200"
                   >
                     <div class="flex items-center gap-2 justify-end text-slate-400 mb-2 text-xs font-bold uppercase tracking-wider group-hover:text-docs-accent dark:group-hover:text-dark-accent">

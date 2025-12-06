@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ParticlesBackground from '../components/ParticlesBackground';
 import ArchiveList from '../components/ArchiveList';
+import { generateShortId } from '../utils/slug';
 import { BLOG_NAME, FEATURES } from '../config';
 
 const allPosts = await getCollection('blog');
@@ -42,7 +43,7 @@ const archiveData = Object.keys(postsByYearMonth)
       .map(month => ({
         month,
         posts: postsByYearMonth[year][month].map(post => ({
-          slug: post.slug,
+          slug: generateShortId(post.id),
           title: post.data.title,
           date: post.data.date,
           tags: post.data.tags,

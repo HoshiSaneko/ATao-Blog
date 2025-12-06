@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import PostCard from '../components/PostCard';
 import AuthorCard from '../components/AuthorCard';
 import ParticlesBackground from '../components/ParticlesBackground';
+import { generateShortId } from '../utils/slug';
 import { BLOG_NAME, FEATURES } from '../config';
 
 const allPosts = await getCollection('blog');
@@ -60,7 +61,7 @@ const latestPosts = allPosts
                   date: post.data.date,
                   tags: post.data.tags,
                   readingTime: post.data.readingTime,
-                  slug: post.slug,
+                  slug: generateShortId(post.id),
                 }}
               />
             ))}

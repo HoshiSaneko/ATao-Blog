@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
+import { generateShortId } from '../utils/slug';
 import { BLOG_NAME, SITE_DESCRIPTION, FRIEND_LINK_CONTACT } from '../config';
 
 export const GET: APIRoute = async () => {
@@ -14,7 +15,8 @@ export const GET: APIRoute = async () => {
 
   const items = sorted
     .map((post) => {
-      const url = `${site}/posts/${post.slug}`;
+      const shortId = generateShortId(post.id);
+      const url = `${site}/posts/${shortId}`;
       const pubDate = new Date(post.data.date.replace(/年|月|日/g, '/')).toUTCString();
 
       return `
