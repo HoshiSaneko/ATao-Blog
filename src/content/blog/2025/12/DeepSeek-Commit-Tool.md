@@ -1,7 +1,7 @@
 ---
 title: DeepSeek-Commit-Tool
 date: '2025年12月07日'
-tags: ['经验分享', '工具推荐']
+tags: ['经验分享']
 summary: 介绍如何使用 DeepSeek-Commit-Tool 工具，通过 DeepSeek API 自动生成规范的 Git 提交信息，提升开发效率。
 ---
 
