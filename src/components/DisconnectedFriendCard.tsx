@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { FriendLink } from '../friends';
+import { DISCONNECTED_LEVEL } from '../consts/friendLevels';
 
 interface DisconnectedFriendCardProps {
     link: FriendLink;
@@ -11,72 +12,51 @@ const DisconnectedFriendCard: React.FC<DisconnectedFriendCardProps> = ({ link })
     const [shouldLoad, setShouldLoad] = useState(false);
     const imgRef = useRef<HTMLDivElement>(null);
 
+    const levelInfo = DISCONNECTED_LEVEL;
+
     useEffect(() => {
         if (!imgRef.current || shouldLoad) return;
 
-        // 检查元素是否已经在视口内
-        const checkVisibility = () => {
-            if (!imgRef.current) return false;
-            const rect = imgRef.current.getBoundingClientRect();
-            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-            const windowWidth = window.innerWidth || document.documentElement.clientWidth;
-            return (
-                rect.top < windowHeight + 200 && // 提前200px
-                rect.bottom > -200 &&
-                rect.left < windowWidth + 200 &&
-                rect.right > -200
-            );
-        };
-
-        // 如果已经在视口内，立即加载
-        if (checkVisibility()) {
-            setShouldLoad(true);
-            return;
-        }
-
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setShouldLoad(true);
-                        observer.disconnect();
-                    }
-                });
+                if (entries[0].isIntersecting) {
+                    setShouldLoad(true);
+                    observer.disconnect();
+                }
             },
-            {
-                rootMargin: '200px', // 提前200px开始加载
-                threshold: 0.01,
-            }
+            { rootMargin: '100px' }
         );
 
         observer.observe(imgRef.current);
-
-        // 备用机制：3秒后如果还没加载，强制加载
-        const fallbackTimer = setTimeout(() => {
-            setShouldLoad(true);
-            observer.disconnect();
-        }, 3000);
-
-        return () => {
-            observer.disconnect();
-            clearTimeout(fallbackTimer);
-        };
+        return () => observer.disconnect();
     }, [shouldLoad]);
 
     return (
-        <div className="group relative flex items-center gap-3 p-4 rounded-lg bg-gray-50/50 dark:bg-white/3 border border-gray-200/50 dark:border-white/5 opacity-60">
-            {/* 已失联标签 */}
-            <div className="absolute top-2 right-2 px-2 py-0.5 bg-gray-400 dark:bg-gray-600 text-white text-xs rounded-full z-10">
-                已失联
+        <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`group relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 
+                bg-white dark:bg-white/5 
+                hover:-translate-y-1 hover:shadow-lg
+                ${levelInfo.border}
+                overflow-hidden h-[90px] grayscale opacity-80 hover:grayscale-0 hover:opacity-100
+            `}
+        >
+            {/* Background Decoration Pattern */}
+            <div className={`absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none ${levelInfo.theme}`}>
+                <levelInfo.Icon size={120} />
             </div>
 
-            <div ref={imgRef} className="flex-shrink-0 relative w-12 h-12">
-                {/* 占位符 - 作为背景层 */}
+            {/* Avatar Section */}
+            <div ref={imgRef} className="relative w-14 h-14 flex-shrink-0">
+                <div className={`absolute inset-0 rounded-full border-2 ${levelInfo.border} opacity-20 scale-110`} />
+
                 {!imageLoaded && !imageError && (
-                    <div className="absolute inset-0 w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse z-0" />
+                    <div className="absolute inset-0 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
                 )}
-                {/* 图片 - 始终在文档流中 */}
-                {!imageError && shouldLoad && (
+
+                {(!imageError && shouldLoad) ? (
                     <img
                         src={link.avatar}
                         alt={link.name}
@@ -85,27 +65,41 @@ const DisconnectedFriendCard: React.FC<DisconnectedFriendCardProps> = ({ link })
                             setImageError(true);
                             setImageLoaded(true);
                         }}
-                        className={`w-12 h-12 rounded-full object-cover grayscale transition-opacity duration-300 relative z-10 ${
-                            imageLoaded ? 'opacity-100' : 'opacity-0'
-                        }`}
+                        className={`w-14 h-14 rounded-full object-cover relative z-10 transition-transform duration-500 group-hover:rotate-12 ${imageLoaded ? 'opacity-100' : 'opacity-0'
+                            }`}
                     />
-                )}
-                {/* 加载失败占位符 */}
-                {imageError && (
-                    <div className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-400 text-xs grayscale relative z-10">
+                ) : imageError && (
+                    <div className="w-14 h-14 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-500 z-10 relative">
                         {link.name.charAt(0)}
                     </div>
                 )}
             </div>
-            <div className="flex-grow min-w-0">
-                <h3 className="text-sm font-bold text-gray-500 dark:text-gray-500 truncate mb-0.5">
-                    {link.name}
-                </h3>
-                <p className="text-xs text-gray-400 dark:text-gray-600 line-clamp-1">
+
+            {/* Content Section */}
+            <div className="flex-grow min-w-0 z-10 h-full flex flex-col justify-center">
+                <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-gray-900 dark:text-gray-400 truncate group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                        {link.name}
+                    </h3>
+                </div>
+                <p className="text-xs text-gray-400 dark:text-gray-500 leading-normal line-clamp-2 overflow-hidden text-ellipsis group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors">
                     {link.description}
                 </p>
             </div>
-        </div>
+
+            {/* Ghost Stamp (Bottom Right) */}
+            <div className="absolute bottom-[-5px] right-[-5px] opacity-25 group-hover:opacity-40 transition-all duration-300 group-hover:scale-110 group-hover:rotate-[-12deg] pointer-events-none">
+                <div className={`relative w-24 h-24 flex items-center justify-center ${levelInfo.color}`}>
+                    <div className="absolute top-5 font-black tracking-widest uppercase text-[10px] opacity-100 font-serif">
+                        {levelInfo.title}
+                    </div>
+                    <levelInfo.Icon size={40} strokeWidth={1.5} className="currentColor opacity-60" />
+                    <div className="absolute bottom-5 font-mono text-[9px] opacity-100 font-bold">
+                        LOST
+                    </div>
+                </div>
+            </div>
+        </a>
     );
 };
 

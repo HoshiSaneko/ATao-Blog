@@ -23,9 +23,9 @@ export default function PostCard({ post }: PostCardProps) {
   const hoverScale = POST_CARD.enableHoverEffect ? POST_CARD.hoverScale : 1;
   const borderRadius = POST_CARD.borderRadius;
   const padding = POST_CARD.padding;
-  
+
   return (
-    <article 
+    <article
       className={`group relative bg-white dark:bg-dark-paper transition-all duration-300 ease-out ${POST_CARD.enableHoverEffect ? 'hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50 hover:border-blue-100 dark:hover:border-white/10' : ''} border border-slate-100 dark:border-white/5 cursor-pointer overflow-hidden shadow-sm`}
       style={{
         borderRadius: borderRadius,
@@ -44,7 +44,7 @@ export default function PostCard({ post }: PostCardProps) {
       }}
     >
       <a href={`/posts/${post.slug}`} className="absolute inset-0 z-20"></a>
-      
+
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-50/30 dark:to-blue-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative z-10">
@@ -65,7 +65,7 @@ export default function PostCard({ post }: PostCardProps) {
           {post.title}
         </h3>
 
-        <p 
+        <p
           className="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed"
           style={{
             display: '-webkit-box',
@@ -90,7 +90,7 @@ export default function PostCard({ post }: PostCardProps) {
               </span>
             )}
           </div>
-          
+
           <span className="inline-flex items-center gap-1 text-docs-accent dark:text-dark-accent text-sm font-semibold group-hover:translate-x-1 transition-transform duration-200 shrink-0 ml-2">
             阅读全文 <ArrowRight size={16} />
           </span>

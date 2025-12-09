@@ -187,36 +187,36 @@ export const AUTHOR_PROFILE = {
   role: "自动化开发工程师",
   avatar: "https://cdn.atao.cyou/Web/Avatar.png",
   // 博客内容描述（支持 HTML 标签设置颜色）
-  // 可用颜色类：text-blue-600 dark:text-blue-400（蓝色）、text-indigo-600 dark:text-indigo-400（靛蓝）、
-  // text-emerald-600 dark:text-emerald-400（绿色）、text-purple-600 dark:text-purple-400（紫色）、
-  // text-orange-600 dark:text-orange-400（橙色）、text-pink-600 dark:text-pink-400（粉色）
-  blogContent: "主要分享<span class=\"text-blue-600 dark:text-blue-400 font-bold\">经验分享</span>、<span class=\"text-indigo-600 dark:text-indigo-400 font-bold\">代码</span>和<span class=\"text-emerald-600 dark:text-emerald-400 font-bold\">Minecraft</span>相关的内容。涵盖AI、Docker、WPF、Python、Android等技术领域，以及一些实用的工具和技巧。",
+  // 使用与金色主题协调的暖色调
+  blogContent: "主要分享<span class=\"text-[#8c6b3f] dark:text-[#d3bc8e] font-semibold\">经验分享</span>、<span class=\"text-[#a38753] dark:text-[#d3bc8e] font-semibold\">代码</span>和<span class=\"text-[#be9f65] dark:text-[#d3bc8e] font-semibold\">Minecraft</span>相关的内容。涵盖AI、Docker、WPF、Python、Android等技术领域，以及一些实用的工具和技巧。",
   // 社交链接
   socialLinks: [
     {
       name: "GitHub",
-      icon: "simple-icons:github",
-      url: "https://github.com/ataoyan",
-      color: "hover:text-gray-900 dark:hover:text-white"
+      icon: "mdi:github",
+      url: "https://github.com/ataoyan"
     },
     {
       name: "Bilibili",
-      icon: "simple-icons:bilibili", 
-      url: "https://space.bilibili.com/291198772",
-      color: "hover:text-[#FB7299]"
+      icon: "ri:bilibili-fill",
+      url: "https://space.bilibili.com/291198772"
     },
     {
       name: "抖音",
-      icon: "simple-icons:tiktok",
+      icon: "lineicons:tiktok",
       url: "", // 抖音不需要URL，使用 douyinId
-      douyinId: "71134083952", // 抖音号，点击后复制
-      color: "hover:text-[#000000] dark:hover:text-[#FF0050]"
+      douyinId: "71134083952" // 抖音号，点击后复制
     },
     {
       name: "Email",
-      icon: "Mail", 
-      url: "mailto:qiatao0305@163.com",
-      color: "hover:text-docs-accent dark:hover:text-dark-accent"
+      icon: "carbon:email", 
+      url: "mailto:qiatao0305@163.com"
+    },
+    {
+      name: "WeChat",
+      icon: "mdi:wechat",
+      url: "", // 微信不需要URL，hover时显示二维码
+      wechatQR: "https://cdn.atao.cyou/Web/wechat.jpg" // 微信二维码图片URL
     }
   ],
   // 技能标签分类
@@ -230,14 +230,10 @@ export const AUTHOR_PROFILE = {
   },
   // 位置信息（可选）
   location: "Ningbo, China",
-  // 出生年月
-  birthDate: "1999-03",
   // MBTI
   mbti: "INTJ",
-  // 网站链接
-  website: "https://blog.atao.cyou/",
-  // 微信二维码图片URL
-  wechatQR: "https://cdn.atao.cyou/Web/wechat.jpg"
+  // 出生年份（用于计算年龄和Lv等级）
+  birthYear: 1999
 };
 
 // ============================================
@@ -262,36 +258,6 @@ export const LICENSE_CONFIG = {
 export const ICP_INFO = {
   // 备案号
   icp: "浙ICP备2024096834号-3",
-};
-
-// ============================================
-// 关于页面配置
-// ============================================
-export const ABOUT_PAGE_INFO = {
-  banner: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2070&auto=format&fit=crop",
-  sections: [
-    {
-      title: "关于我",
-      icon: "Feather",
-      content: "一名自动化开发工程师。专注于做自己喜欢的事，分享技术经验与生活点滴。"
-    },
-    {
-      title: "博客内容",
-      icon: "Palette",
-      // 使用 HTML 字符串以保留样式
-      content: "这里主要分享<strong>经验分享</strong>、<strong>代码</strong>和<strong>Minecraft</strong>相关的内容。涵盖 AI、Docker、WPF、Python、Android 等技术领域，以及一些实用的工具和技巧。"
-    },
-    {
-      title: "技术栈",
-      icon: "Code",
-      content: "使用现代前端技术栈构建，专为速度和扩展性而设计。",
-      tags: ['Astro', 'React', 'Tailwind CSS', 'TypeScript', 'Markdown']
-    }
-  ],
-  quote: {
-    text: "\"做自己喜欢的事\"",
-    author: "— ATao"
-  }
 };
 
 // ============================================

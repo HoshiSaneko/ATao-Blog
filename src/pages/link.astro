@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FriendsList from '../components/FriendsList';
+import FriendLevelLegend from '../components/FriendLevelLegend';
 import DisconnectedFriendsList from '../components/DisconnectedFriendsList';
 import SiteInfo from '../components/SiteInfo';
 import Comment from '../components/Comment';
@@ -32,6 +33,9 @@ import { BLOG_NAME, FRIEND_LINK_CONTACT } from '../config';
             探索更多优秀的内容创作者和技术伙伴。
           </p>
         </div>
+
+        <!-- Legend -->
+        <FriendLevelLegend client:visible />
 
         <!-- Friends List with Pagination -->
         <FriendsList client:idle links={FRIEND_LINKS} />
