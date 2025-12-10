@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modern background gradient - 配置在 config.ts 的 THEME_COLORS 中 */
+/* Modern background gradient */
 body {
   background: linear-gradient(135deg, #FAFBFC 0%, #F5F7FA 100%);
   background-attachment: fixed;

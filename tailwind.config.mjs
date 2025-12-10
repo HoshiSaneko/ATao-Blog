@@ -1,8 +1,5 @@
 /**
  * Tailwind CSS 配置文件
- * 
- * 注意：此文件中的颜色和字体配置应与 src/config.ts 中的 THEME_COLORS 和 THEME_FONTS 保持一致
- * 如需修改主题，请同时更新 src/config.ts 和此文件
  */
 
 /** @type {import('tailwindcss').Config} */
@@ -103,6 +100,7 @@ export default {
         'slide-in-left': 'slideInFromLeft 800ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
         'role-badge-enter': 'roleBadgeEnter 900ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
         'tag-slide-in': 'tagSlideIn 0.4s ease-out forwards',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       }
     },
   },
