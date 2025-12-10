@@ -220,60 +220,66 @@ const TableOfContents: React.FC = () => {
       {/* Table of Contents - Fixed position, hidden on small screens */}
       <aside
         style={{ left: `${leftPosition}px` }}
-        className={`hidden lg:block fixed top-24 z-40 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          } scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800`}
+        className={`hidden lg:block fixed top-24 z-40 w-64 max-h-[calc(100vh-8rem)] transition-all duration-500 ease-out ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'
+          }`}
       >
-        <div className="pl-4">
-          {/* Header */}
-          <div className="mb-4">
-            <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-2">
-              <Menu size={14} />
-              本页内容
-            </h3>
+        <div className="relative rounded-lg bg-white/80 dark:bg-[#1a1c23]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 shadow-sm overflow-hidden">
+          {/* Decorative Watermark */}
+          <div className="absolute -bottom-6 -right-6 opacity-[0.03] dark:opacity-[0.05] pointer-events-none rotate-12 scale-125">
+            <svg width="120" height="120" viewBox="0 0 100 100" fill="currentColor">
+              <path d="M50 0L61 39L100 50L61 61L50 100L39 61L0 50L39 39L50 0Z" />
+            </svg>
           </div>
 
-          {/* Navigation items */}
-          <nav className="relative">
-            {/* Track Line */}
-            <div className="absolute left-0 top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-800" />
-
-            <div className="flex flex-col">
-              {headings.map((heading, index) => {
-                const isActive = activeId === heading.id;
-                return (
-                  <a
-                    key={`${heading.id}-${index}`}
-                    href={`#${heading.id}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleClick(heading.id);
-                    }}
-                    className={`group relative py-1.5 pr-4 text-sm transition-all duration-200 leading-snug ${heading.level === 1 ? 'pl-4' :
-                      heading.level === 2 ? 'pl-4' :
-                        heading.level === 3 ? 'pl-8' :
-                          'pl-12'
-                      } ${isActive
-                        ? 'text-docs-accent dark:text-dark-accent font-medium'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                      }`}
-                    title={heading.text}
-                  >
-                    {/* Active/Hover Indicator Line */}
-                    <span
-                      className={`absolute left-0 top-1/2 -translate-y-1/2 h-full w-[2px] transition-all duration-200 rounded-r-full ${isActive
-                        ? 'bg-docs-accent dark:bg-dark-accent opacity-100'
-                        : 'bg-slate-400 dark:bg-slate-500 opacity-0 group-hover:opacity-50 scale-y-50 group-hover:scale-y-100'
-                        }`}
-                    />
-
-                    <span className={`block truncate ${isActive ? 'translate-x-1' : 'group-hover:translate-x-1'} transition-transform duration-200`}>
-                      {heading.text}
-                    </span>
-                  </a>
-                );
-              })}
+          <div className="p-5">
+            {/* Header */}
+            <div className="mb-4 pb-2 border-b border-docs-accent/20 dark:border-dark-accent/20 flex items-center justify-between">
+              <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest flex items-center gap-2">
+                <Menu size={14} className="text-docs-accent" />
+                CATALOG
+              </h3>
             </div>
-          </nav>
+
+            {/* Navigation items */}
+            <nav className="relative max-h-[calc(100vh-14rem)] overflow-y-auto custom-scrollbar pr-2 -mr-3 pl-1">
+              <div className="flex flex-col gap-0.5">
+                {headings.map((heading, index) => {
+                  const isActive = activeId === heading.id;
+                  return (
+                    <a
+                      key={`${heading.id}-${index}`}
+                      href={`#${heading.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleClick(heading.id);
+                      }}
+                      className={`group relative py-1.5 pr-2 text-sm transition-all duration-300 rounded-[4px] leading-snug flex items-center ${heading.level === 1 ? 'pl-2' :
+                          heading.level === 2 ? 'pl-2' :
+                            heading.level === 3 ? 'pl-5' :
+                              'pl-8'
+                        } ${isActive
+                          ? 'text-docs-accent dark:text-dark-accent font-bold bg-docs-accent/5 dark:bg-dark-accent/10'
+                          : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-white/5'
+                        }`}
+                      title={heading.text}
+                    >
+                      {/* Active Indicator */}
+                      <span
+                        className={`absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded-r-full transition-all duration-300 ${isActive
+                            ? 'bg-docs-accent dark:bg-dark-accent opacity-100 shadow-sm shadow-docs-accent/50'
+                            : 'bg-transparent opacity-0'
+                          }`}
+                      />
+
+                      <span className={`block truncate transition-transform duration-300 ${isActive ? 'translate-x-1.5' : 'translate-x-0 group-hover:translate-x-1'}`}>
+                        {heading.text}
+                      </span>
+                    </a>
+                  );
+                })}
+              </div>
+            </nav>
+          </div>
         </div>
       </aside>
     </>

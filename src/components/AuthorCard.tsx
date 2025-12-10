@@ -359,8 +359,8 @@ export default function AuthorCard({ className = '', title, showLicense = true, 
                 <div className="relative z-10 flex flex-wrap gap-2">
                     {AUTHOR_PROFILE.socialLinks?.map((social, index) => {
                         const isDouyin = social.name === '抖音' || (social as any).douyinId;
-                        const isEmail = social.name === 'Email';
-                        const isWeChat = social.name === 'WeChat';
+                        const isEmail = social.name === 'email';
+                        const isWeChat = social.name === 'wechat';
 
                         // Custom Genshin Button Style
                         const btnClass = "flex items-center gap-2 px-3 py-1.5 rounded-sm bg-white dark:bg-[#1e2026] border border-slate-200 dark:border-[#d3bc8e]/20 text-slate-600 dark:text-[#d3bc8e] text-xs hover:border-[#d3bc8e] hover:text-[#a38753] dark:hover:text-[#d3bc8e] hover:bg-[#fffbf0] dark:hover:bg-[#d3bc8e]/10 transition-all cursor-pointer group/btn shadow-sm relative";

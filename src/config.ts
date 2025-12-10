@@ -169,13 +169,13 @@ export const POST_CARD = {
   // 最大显示标签数量
   maxVisibleTags: 3,
   // 摘要最大行数
-  summaryMaxLines: 3,
+  summaryMaxLines: 2,
   // 圆角大小
-  borderRadius: '1rem', // rounded-2xl
+  borderRadius: '4px', // rounded-[4px]
   // 内边距
   padding: {
-    mobile: '1.5rem',  // p-6
-    desktop: '2rem',   // sm:p-8
+    mobile: '1.25rem',  // p-5
+    desktop: '1.25rem', // p-5
   },
 };
 
@@ -192,32 +192,32 @@ export const AUTHOR_PROFILE = {
   // 社交链接
   socialLinks: [
     {
-      name: "GitHub",
+      name: "gitHub",
       icon: "mdi:github",
       url: "https://github.com/ataoyan"
     },
     {
-      name: "Bilibili",
+      name: "bilibili",
       icon: "ri:bilibili-fill",
       url: "https://space.bilibili.com/291198772"
     },
     {
-      name: "抖音",
+      name: "tiktok",
       icon: "lineicons:tiktok",
       url: "", // 抖音不需要URL，使用 douyinId
       douyinId: "71134083952" // 抖音号，点击后复制
     },
     {
-      name: "Email",
-      icon: "carbon:email", 
-      url: "mailto:qiatao0305@163.com"
-    },
-    {
-      name: "WeChat",
+      name: "wechat",
       icon: "mdi:wechat",
       url: "", // 微信不需要URL，hover时显示二维码
       wechatQR: "https://cdn.atao.cyou/Web/wechat.jpg" // 微信二维码图片URL
-    }
+    },
+    {
+      name: "email",
+      icon: "carbon:email",
+      url: "mailto:qiatao0305@163.com"
+    },
   ],
   // 技能标签分类
   skills: {
