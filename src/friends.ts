@@ -173,4 +173,11 @@ export const FRIEND_LINKS: FriendLink[] = [
         avatar: "https://blog-backend.alexma.top/api/v2/objects/avatar/112zjnt1f3c2cf3prp.webp",
         addDate: "2025-12-11"
     },
+    {
+        name: "是飞鱼Blog",
+        description: "一个热衷于分享见闻和科技信息的站点！",
+        url: "https://shifeiyu.cn",
+        avatar: "https://shifeiyu.cn/upload/%E7%AB%99%E7%82%B9logo.png",
+        addDate: "2025-12-31"
+    },
 ];

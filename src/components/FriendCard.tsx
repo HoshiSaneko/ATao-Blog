@@ -27,9 +27,17 @@ const FriendCard: React.FC<FriendCardProps> = ({ link }) => {
     // 计算等级
     const getLevelInfo = () => {
         if (days < 0) return null;
-        // 找到满足天数要求的最高等级
-        // 如果天数超过最高级，直接返回最高级
-        return [...FRIEND_LEVELS].reverse().find(l => days >= l.days) || FRIEND_LEVELS[0];
+        // 根据印记说明的范围来判断：
+        // 初遇：0-30天，萌芽：30-60天，抽叶：60-90天...
+        // 找到第一个满足 days < l.days 的等级，返回这个等级
+        // 如果都满足（days >= 最高级），返回最后一个等级（最高级）
+        const foundIndex = FRIEND_LEVELS.findIndex(l => days < l.days);
+        if (foundIndex === -1) {
+            // 超过最高级，返回最高级
+            return FRIEND_LEVELS[FRIEND_LEVELS.length - 1];
+        }
+        // 返回找到的等级（例如：days=30时，找到60天的萌芽）
+        return FRIEND_LEVELS[foundIndex];
     };
 
     const levelInfo = getLevelInfo();
