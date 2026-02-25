@@ -139,10 +139,10 @@ export const FRIEND_LINKS: FriendLink[] = [
         disconnected: true
     },
     {
-        name: "SatouのBlog",
-        description: "彼女の愛は、甘くて痛い",
-        url: "https://www.matsusatou.top/",
-        avatar: "https://github.com/SokiSama/picked/blob/main/avatar.jpg?raw=true",
+        name: "SokiのBlog",
+        description: "月下彼岸花",
+        url: "https://www.soki.moe",
+        avatar: "https://cdn.jsdelivr.net/gh/SokiSama/picked@main/avatar.jpg",
         addDate: "2025-10-15"
     },
     {
@@ -179,5 +179,19 @@ export const FRIEND_LINKS: FriendLink[] = [
         url: "https://shifeiyu.cn",
         avatar: "https://shifeiyu.cn/upload/%E7%AB%99%E7%82%B9logo.png",
         addDate: "2025-12-31"
+    },
+    {
+        name: "SAKURAIN TEAM",
+        description: "用代码构建未来",
+        url: "https://sakurain.net/",
+        avatar: "https://sakurain.net/image/logo.webp",
+        addDate: "2026-02-09"
+    },
+    {
+        name: "J的个人博客",
+        description: "hi，欢迎来到我的个人博客，我会在这里分享教程，经验与生活",
+        url: "https://blog.jsoftstudio.top/",
+        avatar: "https://blog.jsoftstudio.top/css/all/favicon.ico",
+        addDate: "2026-02-20"
     },
 ];
